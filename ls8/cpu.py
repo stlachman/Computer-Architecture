@@ -7,7 +7,16 @@ class CPU:
 
     def __init__(self):
         """Construct a new CPU."""
-        pass
+        self.reg = [0] * 8
+        self.ram = [0] * 256
+        self.pc = 0
+        self.halted = False
+
+    def ram_read(self, address):
+      print(self.ram[address])
+    
+    def ram_write(self, address, value):
+      self.ram[address] = value
 
     def load(self):
         """Load a program into memory."""
@@ -62,4 +71,23 @@ class CPU:
 
     def run(self):
         """Run the CPU."""
-        pass
+        while not self.halted:
+          instruction = self.ram[self.pc]
+          # LDI store a value in register
+          if instruction == 0b10000010:
+            value = self.ram[self.pc+2]
+            register_num = self.ram[self.pc+1]
+            self.reg[register_num] = value
+            self.pc += 3
+          # PRN print numeric value stored in register
+          elif instruction == 0b01000111:
+            register_num = self.ram[self.pc + 1]
+            print(self.reg[register_num])
+            self.pc += 2
+          # HLT - halt CPU and exit register
+          elif instruction == 0b00000001:
+            self.halted = True
+            self.pc += 1
+          else:
+            print(f"Unknown instruction at index {self.pc}")
+            sys.exit(1)
