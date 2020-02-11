@@ -4,6 +4,7 @@
 
 import sys
 from cpu import *
+import os
 
 
 
@@ -22,7 +23,5 @@ if __name__ == '__main__':
     cpu.load(path + program + extension)
 
   for program in programs_to_run:
-    cpu.run(path + program + extension)
-
-cpu.load()
-cpu.run()
+    cpu.run()
+    cpu.halted = True
