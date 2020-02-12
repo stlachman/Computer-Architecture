@@ -8,7 +8,7 @@ class CPU:
 
     def __init__(self):
         """Construct a new CPU."""
-        self.reg = [0] * 8
+        self.reg = [0, 0, 0, 0, 0, 0, 0, 0xF4]
         self.ram = [0] * 256
         self.pc = 0
         self.halted = False
@@ -18,10 +18,47 @@ class CPU:
           0b00000001 : self.hlt, 
           0b10100010 : self.mult,
           0b01000110 : self.pop,
-          0b01000101 : self.push
+          0b01000101 : self.push,
+          0b00011000 : self.mult2print,
+          0b00010001 : self.ret,
+          0b01010000 : self.call,
+          0b10100000 : "ADD"
         }
-        self.sp = 255
+
+        self.sp = self.reg[7]
+        
     
+    def call(self):
+      # take next item (i.e. register number)
+      next_instruction_reg = self.ram[self.pc + 1]
+      next_instruction = self.reg[next_instruction_reg]
+      
+      
+      if next_instruction in self.instructions: 
+        # find place (pc) to return and store in stack
+        self.ram[self.sp] = self.pc + 2
+        self.pc = next_instruction
+        # call function
+        self.instructions[next_instruction]()
+
+    def mult2print(self):
+      op = self.ram[self.pc]
+      first_register = self.ram[self.pc + 1]
+      second_register = self.ram[self.pc + 2]
+      
+      if op in self.instructions:
+        self.alu(self.instructions[op], first_register, second_register)
+
+      self.pc += 3
+      self.prn()
+      self.ret()
+
+    def ret(self):
+      # Get last pc from stack by popping
+      self.pc = self.ram[self.sp]
+      # Set new pc
+
+    # python ls8.py stack
     def push(self):
       register_num = self.ram[self.pc + 1]
       # prevent sp and pc form crossing over
