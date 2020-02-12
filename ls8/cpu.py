@@ -16,8 +16,35 @@ class CPU:
           0b10000010 : self.ldi, 
           0b01000111 : self.prn, 
           0b00000001 : self.hlt, 
-          0b10100010 : self.mult   
+          0b10100010 : self.mult,
+          0b01000110 : self.pop,
+          0b01000101 : self.push
         }
+        self.sp = 255
+    
+    def push(self):
+      register_num = self.ram[self.pc + 1]
+      # prevent sp and pc form crossing over
+      if self.sp > 0 and self.sp > self.pc + 3:
+        self.sp -= 1
+        self.ram[self.sp] = self.reg[register_num]
+        self.pc += 2
+      else: 
+        print("error")
+      
+
+    def pop(self):
+      register_num = self.ram[self.pc + 1]
+      if self.sp < 256: 
+        # get value from top of stack
+        value = self.ram[self.sp]
+        # assigns to value current register number
+        self.reg[register_num] = value
+        self.sp += 1
+        self.pc += 2
+      else: 
+        print("Nothing in that stack")
+
 
     def ldi(self):
       value = self.ram[self.pc+2]
